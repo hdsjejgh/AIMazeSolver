@@ -2,10 +2,11 @@ from collections import deque
 
 
 class Node:
-    def __init__(self,state,parent,action):
+    def __init__(self,state,parent,action,steps):
         self.state = state
         self.parent = parent
         self.action = action
+        self.steps = steps
 
 class StackFrontier:
     def __init__(self):
@@ -36,14 +37,14 @@ class HeuristicFrontier: #frontier that returns node closest to goal
         self.frontier = []
 
     def GetNode(self,goal):
-        def GetDist(stae,goal):
+        def GetDist(node,goal):
             total = 0
             for i in range(2):
-                total += abs(goal[i] - stae[i])
+                total += abs(goal[i] - node.state[i])+node.steps
             return total
         min = 0
         for i,ii in enumerate(self.frontier):
-            if GetDist(ii.state,goal) < min:
+            if GetDist(ii,goal) < min:
                 min = i
         node = self.frontier[min]
         self.frontier.pop(min)
@@ -100,13 +101,15 @@ class Maze:
                 result.append((action, (r, c)))
         return result
     def solve(self):
-        start = Node(self.start, None, None)
+        steps=0
+        start = Node(self.start, None, None,steps)
         self.frontier.AddNode(start)
         while True:
             if self.frontier.empty():
                 print("No solution")
                 return
             node = self.frontier.GetNode(self.goal)
+            steps+=1
             if node.state == self.goal:
                 self.solution = self.getSol(node)
                 self.print()
@@ -115,7 +118,7 @@ class Maze:
             self.explored.add(node.state)
             for action, sta in self.neighbors(node.state):
                 if (not self.frontier.contains(sta)) and (sta not in self.explored):
-                    self.frontier.AddNode(Node(state=sta,parent=node,action=action))
+                    self.frontier.AddNode(Node(state=sta,parent=node,action=action,steps=steps))
     def getSol(self,node):
         solution =[]
         while (node.parent!=None):
@@ -153,5 +156,5 @@ m1.solve()
 m2=Maze("maze4.txt",StackFrontier)#solves maze with StackFrontier (Depth First Search)
 m2.solve()
 
-m3=Maze("maze4.txt",HeuristicFrontier)#solves maze with StackFrontier (Depth First Search)
+m3=Maze("maze5.txt",HeuristicFrontier)#solves maze with StackFrontier (Depth First Search)
 m3.solve()
