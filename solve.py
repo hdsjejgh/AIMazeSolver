@@ -12,7 +12,7 @@ class StackFrontier:
         self.frontier = [];
     def AddNode(self,node):
         self.frontier.append(node)
-    def GetNode(self):
+    def GetNode(self, x):
         return self.frontier.pop()
     def empty(self):
         return len(self.frontier)==0
@@ -22,7 +22,7 @@ class StackFrontier:
 class QueueFrontier:
     def __init__(self):
         self.frontier = deque([])
-    def GetNode(self):
+    def GetNode(self, x):
         return self.frontier.popleft()
     def AddNode(self,node):
         self.frontier.append(node)
@@ -30,6 +30,32 @@ class QueueFrontier:
         return len(self.frontier)==0
     def contains(self,state):
         return any(node.state==state for node in self.frontier)
+
+class HeuristicFrontier: #frontier that returns node closest to goal
+    def __init__(self):
+        self.frontier = []
+
+    def GetNode(self,goal):
+        def GetDist(stae,goal):
+            total = 0
+            for i in range(2):
+                total += abs(goal[i] - stae[i])
+            return total
+        min = 0
+        for i,ii in enumerate(self.frontier):
+            if GetDist(ii.state,goal) < min:
+                min = i
+        node = self.frontier[min]
+        self.frontier.pop(min)
+        return node
+
+    def AddNode(self,node):
+        self.frontier.append(node)
+    def empty(self):
+        return len(self.frontier)==0
+    def contains(self,state):
+        return any(node.state==state for node in self.frontier)
+
 
 class Maze:
     def __init__(self, file,frontierType=StackFrontier):
@@ -77,11 +103,10 @@ class Maze:
         start = Node(self.start, None, None)
         self.frontier.AddNode(start)
         while True:
-
             if self.frontier.empty():
                 print("No solution")
                 return
-            node = self.frontier.GetNode()
+            node = self.frontier.GetNode(self.goal)
             if node.state == self.goal:
                 self.solution = self.getSol(node)
                 self.print()
@@ -121,8 +146,12 @@ class Maze:
             result+=row
         print(result)
 
+
 m1=Maze("maze4.txt",QueueFrontier)#solves maze with QueueFrontier (Breadth First Search)
 m1.solve()
 
 m2=Maze("maze4.txt",StackFrontier)#solves maze with StackFrontier (Depth First Search)
 m2.solve()
+
+m3=Maze("maze4.txt",HeuristicFrontier)#solves maze with StackFrontier (Depth First Search)
+m3.solve()
