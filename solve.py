@@ -80,11 +80,13 @@ class Maze:
 
             if self.frontier.empty():
                 print("No solution")
+                return
             node = self.frontier.GetNode()
             if node.state == self.goal:
                 self.solution = self.getSol(node)
                 self.print()
                 print("Solution found")
+                return
             self.explored.add(node.state)
             for action, sta in self.neighbors(node.state):
                 if (not self.frontier.contains(sta)) and (sta not in self.explored):
@@ -109,6 +111,8 @@ class Maze:
                     elif self.contents[r][c]==" ":
                         if (r,c) in self.solution:
                             row+="O"
+                        elif (r,c) in self.explored:
+                            row+="."
                         else:
                             row+=" "
                 except:
@@ -120,5 +124,5 @@ class Maze:
 m1=Maze("maze4.txt",QueueFrontier)#solves maze with QueueFrontier (Breadth First Search)
 m1.solve()
 
-m2=Maze("maze4.txt",QueueFrontier)#solves maze with StackFrontier (Depth First Search)
+m2=Maze("maze4.txt",StackFrontier)#solves maze with StackFrontier (Depth First Search)
 m2.solve()
