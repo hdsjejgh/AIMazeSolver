@@ -1,1 +1,1 @@
-Peak, microsoft should hire me.
+Maze solver. Has BFS, DFS, and A* Search
